@@ -1,0 +1,90 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+// Struct untuk menyimpan informasi pesanan
+struct Order {
+    int id;
+    string pickup;
+    string destination;
+    string deliveryTime;
+};
+
+// Fungsi untuk mencetak data pesanan
+void printOrders(const vector<Order>& orders) {
+    for (vector<Order>::const_iterator it = orders.begin(); it != orders.end(); ++it) {
+        cout << "(" << it->id << ", "
+             << it->pickup << ", "
+             << it->destination << ", "
+             << it->deliveryTime << ")" << endl;
+    }
+}
+
+// Fungsi untuk menggabungkan dua bagian yang sudah diurutkan
+vector<Order> merge(const vector<Order>& left, const vector<Order>& right) {
+    vector<Order> sorted;
+    int i = 0, j = 0;
+
+    while (i < left.size() && j < right.size()) {
+        if (left[i].deliveryTime <= right[j].deliveryTime) {
+            sorted.push_back(left[i]);
+            i++;
+        } else {
+            sorted.push_back(right[j]);
+            j++;
+        }
+    }
+
+    // Tambahkan elemen yang tersisa
+    while (i < left.size()) {
+        sorted.push_back(left[i]);
+        i++;
+    }
+    while (j < right.size()) {
+        sorted.push_back(right[j]);
+        j++;
+    }
+
+    return sorted;
+}
+
+// Fungsi Merge Sort
+vector<Order> mergeSort(const vector<Order>& orders) {
+    if (orders.size() <= 1) {
+        return orders;
+    }
+
+    int mid = orders.size() / 2;
+    vector<Order> left(orders.begin(), orders.begin() + mid);
+    vector<Order> right(orders.begin() + mid, orders.end());
+
+    left = mergeSort(left);
+    right = mergeSort(right);
+
+    return merge(left, right);
+}
+
+int main() {
+    // Data pesanan - Tambahkan elemen satu per satu (untuk kompatibilitas C++98)
+    vector<Order> orders;
+    Order order1 = {101, "A", "B", "2023-12-01 10:00:00"};
+    Order order2 = {102, "C", "D", "2023-12-01 09:30:00"};
+    Order order3 = {103, "E", "F", "2023-12-01 10:15:00"};
+    Order order4 = {104, "G", "H", "2023-12-01 09:45:00"};
+    orders.push_back(order1);
+    orders.push_back(order2);
+    orders.push_back(order3);
+    orders.push_back(order4);
+
+    cout << "Data Pesanan Sebelum Sorting:" << endl;
+    printOrders(orders);
+
+    // Sorting berdasarkan waktu pengiriman
+    orders = mergeSort(orders);
+
+    cout << "\nData Pesanan Setelah Sorting Berdasarkan Waktu Pengiriman:" << endl;
+    printOrders(orders);
+
+    return 0;
+}
